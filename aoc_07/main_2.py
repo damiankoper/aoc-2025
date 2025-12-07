@@ -1,0 +1,39 @@
+from re import split
+from pprint import pprint
+from functools import reduce
+
+rows: list[str] = []
+rows_map: list[list[int]] = []
+
+with open("./aoc_07/input.txt") as file:
+    content = file.read()
+    rows = content.split('\n')
+
+for y in range(len(rows)):
+    row = []
+    for x in range(len(rows[0])):
+        row.append(0)
+    rows_map.append(row)
+
+for y in range(1, len(rows)):
+    for x in range(len(rows[0])):
+        char = rows[y][x]
+        char_up = rows[y - 1][x]
+        char_left = None if x == 0 else rows[y][x - 1]
+        char_right = None if x == len(rows[0]) - 1 else rows[y][x + 1]
+        char_up_right = None if x == len(rows[0]) - 1 else rows[y - 1][x + 1]
+        char_up_left = None if x == 0 else rows[y - 1][x - 1]
+        if char_up == "S" and char == ".":
+            rows[y] = rows[y][:x] + "|" + rows[y][x+1:]
+            rows_map[y][x] += 1
+        if char_up == "|" and char == ".":
+            rows[y] = rows[y][:x] + "|" + rows[y][x + 1:]
+            rows_map[y][x] += rows_map[y - 1][x]
+        if char_right == "^" and char_up_right == "|" and char == ".":
+            rows[y] = rows[y][:x] + "|" + rows[y][x + 1:]
+            rows_map[y][x] += rows_map[y - 1][x + 1]
+        if char_left == "^" and char_up_left == "|" and char == ".":
+            rows[y] = rows[y][:x] + "|" + rows[y][x + 1:]
+            rows_map[y][x] += rows_map[y - 1][x - 1]
+
+pprint(sum(rows_map[len(rows_map)-1]))
